@@ -20,16 +20,16 @@ func run(ctx context.Context, cfg Config) {
 			select {
 			case <-ctx.Done():
 				return
-			case jobs <- i:			
+			case jobs <- i:
 			}
-			
+
 		}
 	}()
 
 	for i := 0; i < cfg.Workers; i++ {
 		wg.Go(func() {
-            worker(ctx, httpClient, cfg.Timeout, jobs, results)
-        })
+			worker(ctx, httpClient, cfg.Timeout, jobs, results)
+		})
 	}
 
 	go func() {
