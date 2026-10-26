@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"strconv"
 )
 
 type Movie struct {
@@ -21,16 +22,38 @@ type Result struct {
 	Err  error
 }
 
+type Stringer interface {
+    String() string
+}
+
+func (res Result) String() string {
+	switch {
+	case res.Err == nil:
+		return fmt.Sprintf(
+			"id: %d | year: %d | title: %s | director: %s\n",
+		 	res.Id, res.Data.Year, res.Data.Title, res.Data.Director,
+		)
+		
+	case errors.Is(res.Err, context.Canceled):
+		return fmt.Sprintf("id: %d | canceled: %v\n", res.Id, res.Err)
+
+	case errors.Is(res.Err, context.DeadlineExceeded):
+		return fmt.Sprintf("id: %d | deadline exceeded: %v\n", res.Id, res.Err)
+
+	default:
+		return fmt.Sprintf("id: %d | error: %v\n", res.Id, res.Err)
+	}
+}
+
 func fetchMovie(ctx context.Context, client *http.Client, timeout time.Duration, movieId int) Result {
 	result := Result{Id: movieId}
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	id := fmt.Sprintf("%d", movieId)
 	var req, err = http.NewRequestWithContext(
 		ctx,
-		"GET",
-		"https://homeworksite.site/"+id+"/info.0.json",
+		http.MethodGet,
+		"https://homeworksite.site/"+ strconv.Itoa(movieId) +"/info.0.json",
 		nil,
 	)
 	if err != nil {
@@ -57,21 +80,4 @@ func fetchMovie(ctx context.Context, client *http.Client, timeout time.Duration,
 	result.Data = movie
 
 	return result
-}
-
-func printResult(res Result) {
-	switch {
-	case res.Err == nil:
-		fmt.Printf("id: %d | year: %d | title: %s | director: %s\n", res.Id, res.Data.Year, res.Data.Title, res.Data.Director)
-		return
-	case errors.Is(res.Err, context.Canceled):
-		fmt.Printf("id: %d | canceled: %v\n", res.Id, res.Err)
-		return
-	case errors.Is(res.Err, context.DeadlineExceeded):
-		fmt.Printf("id: %d | deadline exceeded: %v\n", res.Id, res.Err)
-		return
-	default:
-		fmt.Printf("id: %d | error: %v\n", res.Id, res.Err)
-		return
-	}
 }
