@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"sync"
+	"fmt"
 )
 
 func run(ctx context.Context, cfg Config) {
@@ -38,6 +39,6 @@ func run(ctx context.Context, cfg Config) {
 	}()
 
 	for res := range results {
-		printResult(res)
+		fmt.Println(res)
 	}
 }

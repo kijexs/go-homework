@@ -11,8 +11,13 @@ func worker(ctx context.Context, client *http.Client, timeout time.Duration, job
 		select {
 		case <-ctx.Done():
 			return
-		case results <- fetchMovie(ctx, client, timeout, movieId):
-
+		default:
+			result := fetchMovie(ctx, client, timeout, movieId)
+			select {
+			case results <- result:
+			case <-ctx.Done():
+				return
+			}
 		}
 	}
 }
