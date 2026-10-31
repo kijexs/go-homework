@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "go-homework/proto/pb";
+
+service MoviesService {
+	rpc LoadMovies(LoadMoviesRequest) returns (LoadMoviesResponse) {}
+	rpc GetLastMovie(google.protobuf.Empty) returns (MovieResponse) {}
+}
+
+message LoadMoviesRequest {
+	int64 from = 1;
+	int64 to = 2;
+}
+
+message MovieResponse {
+	int64 id = 1;
+	string title = 2;
+	int64 year = 3;
+	string director = 4;
+	string message = 5;
+}
+
+message LoadMoviesResponse {
+    repeated MovieResponse movies = 1;
+}
