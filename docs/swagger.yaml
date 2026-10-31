@@ -1,0 +1,102 @@
+basePath: /
+definitions:
+  httpserver.httpMovieResponse:
+    properties:
+      director:
+        type: string
+      error:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      year:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: HTTP API for fetching movies from an external movie service
+  title: Movie API
+  version: "1.0"
+paths:
+  /last-movie:
+    get:
+      description: Returns information about last movie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpserver.httpMovieResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
+        "504":
+          description: Gateway Timeout
+          schema:
+            type: string
+      summary: Get last movies information
+      tags:
+      - last-movie
+  /load-movies:
+    get:
+      description: Returns list of movies
+      parameters:
+      - description: Movie from
+        in: query
+        name: from
+        required: true
+        type: integer
+      - description: Movie to
+        in: query
+        name: to
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/httpserver.httpMovieResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
+        "504":
+          description: Gateway Timeout
+          schema:
+            type: string
+      summary: Get movies information
+      tags:
+      - load-movies
+swagger: "2.0"
