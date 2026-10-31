@@ -48,8 +48,8 @@ type Result struct {
 }
 
 var (
-    ErrNotFound    = errors.New("movie not found")
-    ErrUnavailable = errors.New("movie service unavailable")
+	ErrNotFound        = errors.New("movie not found")
+	ErrUnavailable     = errors.New("movie service unavailable")
 	ErrInvalidArgument = errors.New("get invalid argument")
 )
 
@@ -97,7 +97,6 @@ func fetchMovie(ctx context.Context, service MovieService, movieId int) Result {
 		}
 		return result
 	}
-	
 
 	var movie Movie
 	err = json.NewDecoder(res.Body).Decode(&movie)
@@ -156,15 +155,15 @@ func (s *MovieService) LoadMovies(ctx context.Context, req MovieRequest) (*[]Res
 func (s *MovieService) GetLastMovie(ctx context.Context) (*Result, error) {
 	low := 1
 	hight := 1
-	
+
 	for {
 		res := fetchMovie(ctx, *s, hight)
-		
+
 		if errors.Is(res.Err, ErrNotFound) {
 			break
 		}
 		if res.Err != nil {
-			return  nil, res.Err
+			return nil, res.Err
 		}
 		low = hight
 		hight *= 2
@@ -189,6 +188,6 @@ func (s *MovieService) GetLastMovie(ctx context.Context) (*Result, error) {
 	if lastFilm.Id == 0 {
 		return nil, fmt.Errorf("Get last movie: %w", ErrNotFound)
 	}
-	
+
 	return &lastFilm, nil
 }

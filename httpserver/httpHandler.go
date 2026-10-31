@@ -1,12 +1,12 @@
 package httpserver
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"go-homework/movie"
 	"net/http"
 	"strconv"
-	"context"
 )
 
 type httpHandler struct {
@@ -47,11 +47,11 @@ func mapHTTPError(err error) int {
 	case errors.Is(err, movie.ErrUnavailable):
 		return http.StatusServiceUnavailable
 	case errors.Is(err, context.DeadlineExceeded):
-        return http.StatusGatewayTimeout
+		return http.StatusGatewayTimeout
 	case errors.Is(err, movie.ErrInvalidArgument):
 		return http.StatusBadRequest
 	default:
-        return http.StatusInternalServerError
+		return http.StatusInternalServerError
 	}
 }
 
