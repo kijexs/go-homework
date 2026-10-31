@@ -2,13 +2,13 @@ package grpcserver
 
 import (
 	"context"
+	"errors"
 	"go-homework/movie"
 	"go-homework/proto/pb"
-	"errors"
 
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 type grpcHandler struct {
@@ -23,7 +23,7 @@ func NewGRPCHandler(movies *movie.MovieService) *grpcHandler {
 func mapGRPCError(err error) error {
 	switch {
 	case errors.Is(err, movie.ErrNotFound):
-        return status.Error(codes.NotFound, err.Error())
+		return status.Error(codes.NotFound, err.Error())
 	case errors.Is(err, movie.ErrUnavailable):
 		return status.Error(codes.Unavailable, err.Error())
 	case errors.Is(err, movie.ErrInvalidArgument):
@@ -31,9 +31,9 @@ func mapGRPCError(err error) error {
 	case errors.Is(err, context.Canceled):
 		return status.Error(codes.Canceled, err.Error())
 	case errors.Is(err, context.DeadlineExceeded):
-        return status.Error(codes.DeadlineExceeded, err.Error())
+		return status.Error(codes.DeadlineExceeded, err.Error())
 	default:
-        return status.Error(codes.Internal, err.Error())
+		return status.Error(codes.Internal, err.Error())
 	}
 }
 

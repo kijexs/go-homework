@@ -12,13 +12,13 @@ import (
 	"time"
 
 	httpSwagger "github.com/swaggo/http-swagger/v2"
-	_ "go-homework/docs"                                                                                                                                                                                                                                                                                                                                        
+	_ "go-homework/docs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
 // @title Movie API
-// @version 1.0                                                                                                                                                               
+// @version 1.0
 // @description HTTP API for fetching movies from an external movie service
 // @host localhost:8080
 // @BasePath /
