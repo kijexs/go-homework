@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go-homework/grpcserver"
-	"go-homework/httpserver"
-	"go-homework/movie"
+	"go-homework/adapter"
+	"go-homework/handler/grpcserver"
+	"go-homework/handler/httpserver"
 	"go-homework/proto/pb"
+	"go-homework/usecase"
 	"net"
 	"net/http"
 	"os"
@@ -37,7 +38,9 @@ func main() {
 		Timeout: 30 * time.Second,
 	}
 
-	movieService := movie.NewMovieService(httpClient, baseURL, 5, 5*time.Second)
+	provider := adapter.NewMovieProvider(httpClient, baseURL, 5*time.Second)
+
+	movieService := usecase.NewMovieService(provider, 5)
 
 	grpcHandler := grpcserver.NewGRPCHandler(movieService)
 

@@ -3,7 +3,7 @@ package grpcserver
 import (
 	"context"
 	"errors"
-	"go-homework/movie"
+	"go-homework/domain"
 	"go-homework/proto/pb"
 
 	"google.golang.org/grpc/codes"
@@ -13,20 +13,20 @@ import (
 
 type grpcHandler struct {
 	pb.UnimplementedMoviesServiceServer
-	movies *movie.MovieService
+	movies domain.MovieUseCase
 }
 
-func NewGRPCHandler(movies *movie.MovieService) *grpcHandler {
+func NewGRPCHandler(movies domain.MovieUseCase) *grpcHandler {
 	return &grpcHandler{movies: movies}
 }
 
 func mapGRPCError(err error) error {
 	switch {
-	case errors.Is(err, movie.ErrNotFound):
+	case errors.Is(err, domain.ErrNotFound):
 		return status.Error(codes.NotFound, err.Error())
-	case errors.Is(err, movie.ErrUnavailable):
+	case errors.Is(err, domain.ErrUnavailable):
 		return status.Error(codes.Unavailable, err.Error())
-	case errors.Is(err, movie.ErrInvalidArgument):
+	case errors.Is(err, domain.ErrInvalidArgument):
 		return status.Error(codes.InvalidArgument, err.Error())
 	case errors.Is(err, context.Canceled):
 		return status.Error(codes.Canceled, err.Error())
@@ -41,14 +41,14 @@ func (c *grpcHandler) LoadMovies(ctx context.Context, req *pb.LoadMoviesRequest)
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request must not be nil")
 	}
-	request := movie.MovieRequest{To: int(req.To), From: int(req.From)}
+	request := domain.MovieRequest{To: int(req.To), From: int(req.From)}
 	res, err := c.movies.LoadMovies(ctx, request)
 	if err != nil {
 		return nil, mapGRPCError(err)
 	}
 
 	moviesList := []*pb.MovieResponse{}
-	for _, mov := range *res {
+	for _, mov := range res {
 		message := ""
 		if mov.Err != nil {
 			message = mov.Err.Error()
