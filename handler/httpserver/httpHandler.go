@@ -4,16 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"go-homework/movie"
+	"go-homework/domain"
 	"net/http"
 	"strconv"
 )
 
 type httpHandler struct {
-	movies *movie.MovieService
+	movies domain.MovieUseCase
 }
 
-func NewHttpHadler(movies *movie.MovieService) *httpHandler {
+func NewHttpHadler(movies domain.MovieUseCase) *httpHandler {
 	return &httpHandler{movies: movies}
 }
 
@@ -25,7 +25,7 @@ type httpMovieResponse struct {
 	Err      string `json:"error,omitempty"`
 }
 
-func toHttpMovieResponse(res movie.Result) httpMovieResponse {
+func toHttpMovieResponse(res domain.Result) httpMovieResponse {
 	errMessage := ""
 	if res.Err != nil {
 		errMessage = res.Err.Error()
@@ -42,13 +42,13 @@ func toHttpMovieResponse(res movie.Result) httpMovieResponse {
 
 func mapHTTPError(err error) int {
 	switch {
-	case errors.Is(err, movie.ErrNotFound):
+	case errors.Is(err, domain.ErrNotFound):
 		return http.StatusNotFound
-	case errors.Is(err, movie.ErrUnavailable):
+	case errors.Is(err, domain.ErrUnavailable):
 		return http.StatusServiceUnavailable
 	case errors.Is(err, context.DeadlineExceeded):
 		return http.StatusGatewayTimeout
-	case errors.Is(err, movie.ErrInvalidArgument):
+	case errors.Is(err, domain.ErrInvalidArgument):
 		return http.StatusBadRequest
 	default:
 		return http.StatusInternalServerError
@@ -81,15 +81,15 @@ func (s *httpHandler) HandleLoadMovies(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	movieRequest := movie.MovieRequest{From: from, To: to}
+	movieRequest := domain.MovieRequest{From: from, To: to}
 	res, err := s.movies.LoadMovies(r.Context(), movieRequest)
 	if err != nil {
 		http.Error(w, err.Error(), mapHTTPError(err))
 		return
 	}
 
-	httpMovieRes := make([]httpMovieResponse, 0, len(*res))
-	for _, mov := range *res {
+	httpMovieRes := make([]httpMovieResponse, 0, len(res))
+	for _, mov := range res {
 		httpMovieRes = append(httpMovieRes, toHttpMovieResponse(mov))
 	}
 
@@ -121,7 +121,7 @@ func (s *httpHandler) HandleGetLastMovie(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	movieJSON, err := json.Marshal(toHttpMovieResponse(*res))
+	movieJSON, err := json.Marshal(toHttpMovieResponse(res))
 	if err != nil {
 		http.Error(w, err.Error(), mapHTTPError(err))
 		return
