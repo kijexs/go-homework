@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"go-homework/domain"
+	"go-homework/internal/domain"
 	"net/http"
 	"strconv"
 )

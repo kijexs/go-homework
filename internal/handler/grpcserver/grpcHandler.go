@@ -3,7 +3,7 @@ package grpcserver
 import (
 	"context"
 	"errors"
-	"go-homework/domain"
+	"go-homework/internal/domain"
 	"go-homework/proto/pb"
 
 	"google.golang.org/grpc/codes"
