@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"go-homework/domain"
+	"go-homework/internal/domain"
 )
 
 type Provider struct {
@@ -39,7 +39,6 @@ type jsonMovie struct {
 }
 
 func (p *Provider) GetMovie(ctx context.Context, id int) (domain.Movie, error) {
-	result := domain.Movie{}
 	ctx, cancel := context.WithTimeout(ctx, p.fetchTimeout)
 	defer cancel()
 
@@ -50,19 +49,19 @@ func (p *Provider) GetMovie(ctx context.Context, id int) (domain.Movie, error) {
 		nil,
 	)
 	if err != nil {
-		return result, fmt.Errorf("error forming a new request: %w", err)
+		return domain.Movie{}, fmt.Errorf("error forming a new request: %w", err)
 	}
 	res, err := p.httpClient.Do(req)
 	if err != nil {
 		switch {
 		case errors.Is(err, context.Canceled):
-			return result, fmt.Errorf("movie %d: request canceled: %w", id, err)
+			return domain.Movie{}, fmt.Errorf("movie %d: request canceled: %w", id, err)
 
 		case errors.Is(err, context.DeadlineExceeded):
-			return result, fmt.Errorf("movie %d: request timeout: %w", id, err)
+			return domain.Movie{}, fmt.Errorf("movie %d: request timeout: %w", id, err)
 
 		default:
-			return result, fmt.Errorf("movie %d: %w: %v", id, domain.ErrUnavailable, err)
+			return domain.Movie{}, fmt.Errorf("movie %d: %w: %v", id, domain.ErrUnavailable, err)
 		}
 	}
 	defer res.Body.Close()
@@ -70,20 +69,20 @@ func (p *Provider) GetMovie(ctx context.Context, id int) (domain.Movie, error) {
 	if res.StatusCode != http.StatusOK {
 		switch {
 		case res.StatusCode == http.StatusNotFound:
-			return result, fmt.Errorf("movie %d: %w", id, domain.ErrNotFound)
+			return domain.Movie{}, fmt.Errorf("movie %d: %w", id, domain.ErrNotFound)
 
 		case res.StatusCode >= 500:
-			return result, fmt.Errorf("movie %d: %w", id, domain.ErrUnavailable)
+			return domain.Movie{}, fmt.Errorf("movie %d: %w", id, domain.ErrUnavailable)
 
 		default:
-			return result, fmt.Errorf("movie %d: unexpected status %d", id, res.StatusCode)
+			return domain.Movie{}, fmt.Errorf("movie %d: unexpected status %d", id, res.StatusCode)
 		}
 	}
 
 	var movie jsonMovie
 	err = json.NewDecoder(res.Body).Decode(&movie)
 	if err != nil {
-		return result, fmt.Errorf("decode response: %w", err)
+		return domain.Movie{}, fmt.Errorf("decode response: %w", err)
 	}
 
 	return domain.Movie{

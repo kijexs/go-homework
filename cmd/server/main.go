@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go-homework/adapter"
-	"go-homework/handler/grpcserver"
-	"go-homework/handler/httpserver"
+	"go-homework/internal/adapter"
+	"go-homework/internal/handler/grpcserver"
+	"go-homework/internal/handler/httpserver"
+	"go-homework/internal/usecase"
 	"go-homework/proto/pb"
-	"go-homework/usecase"
 	"net"
 	"net/http"
 	"os"

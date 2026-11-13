@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"go-homework/domain"
+	"go-homework/internal/domain"
 )
 
 func worker(ctx context.Context, service *MovieService, jobs <-chan int, results chan<- domain.Result) {
