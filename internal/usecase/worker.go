@@ -5,13 +5,15 @@ import (
 	"go-homework/internal/domain"
 )
 
-func worker(ctx context.Context, service *MovieService, jobs <-chan int, results chan<- domain.Result) {
+type MovieFetcher func(ctx context.Context, id int) (domain.Movie, error)
+
+func worker(ctx context.Context, fetch MovieFetcher, jobs <-chan int, results chan<- domain.Result) {
 	for movieId := range jobs {
 		select {
 		case <-ctx.Done():
 			return
 		default:
-			movie, err := service.provider.GetMovie(ctx, movieId)
+			movie, err := fetch(ctx, movieId)
 
 			result := domain.Result{
 				Id:   movieId,

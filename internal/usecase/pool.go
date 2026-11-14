@@ -7,7 +7,7 @@ import (
 	"go-homework/internal/domain"
 )
 
-func (s *MovieService) loadMoviesParallel(ctx context.Context, req domain.MovieRequest) ([]domain.Result, error) {
+func loadMoviesParallel(ctx context.Context, ids []int, workerCount int, fetch MovieFetcher) ([]domain.Result, error) {
 	result := []domain.Result{}
 	var wg sync.WaitGroup
 
@@ -16,19 +16,19 @@ func (s *MovieService) loadMoviesParallel(ctx context.Context, req domain.MovieR
 
 	go func() {
 		defer close(jobs)
-		for i := req.From; i <= req.To; i++ {
+		for _, id := range ids {
 			select {
 			case <-ctx.Done():
 				return
-			case jobs <- i:
+			case jobs <- id:
 			}
 
 		}
 	}()
 
-	for i := 0; i < s.workerCount; i++ {
+	for i := 0; i < workerCount; i++ {
 		wg.Go(func() {
-			worker(ctx, s, jobs, results)
+			worker(ctx, fetch, jobs, results)
 		})
 	}
 
