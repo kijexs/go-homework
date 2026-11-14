@@ -25,7 +25,7 @@ func (r *MovieRepository) GetByID(
 ) (domain.Movie, error) {
 	var m domain.Movie
 	err := r.pool.QueryRow(ctx,
-		`SELECT title, release_year, director
+		`SELECT title, year, director
          FROM movies WHERE id = $1`, id,
 	).Scan(&m.Title, &m.Year, &m.Director)
 
@@ -43,7 +43,7 @@ func (r *MovieRepository) Save(
 	ctx context.Context, id int, movie domain.Movie,
 ) error {
 	_, err := r.pool.Exec(ctx,
-		`INSERT INTO movies (id, title, release_year, director)
+		`INSERT INTO movies (id, title, year, director)
 		VALUES($1, $2, $3, $4)
 		ON CONFLICT (id) DO NOTHING;`,
 		id, movie.Title, movie.Year, movie.Director,
@@ -59,7 +59,7 @@ func (r *MovieRepository) GetLast(
 ) (domain.Result, error) {
 	var m domain.Result
 	err := r.pool.QueryRow(ctx,
-		`SELECT id, title, release_year, director
+		`SELECT id, title, year, director
 		FROM movies
 		ORDER BY id DESC
 		LIMIT 1`,
