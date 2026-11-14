@@ -8,7 +8,7 @@ import (
 	"go-homework/internal/domain"
 )
 
-func (s *MovieService) findUpperBound(ctx context.Context) (int, int, error) {
+func (s *MovieSyncService) findUpperBound(ctx context.Context) (int, int, error) {
 	low := 1
 	high := 1
 
@@ -27,7 +27,7 @@ func (s *MovieService) findUpperBound(ctx context.Context) (int, int, error) {
 	return low, high, nil
 }
 
-func (s *MovieService) binarySearchLastMovie(ctx context.Context, low, high int) (domain.Result, error) {
+func (s *MovieSyncService) binarySearchLastMovie(ctx context.Context, low, high int) (domain.Result, error) {
 	lastFilm := domain.Result{}
 
 	for low <= high {
